@@ -8,7 +8,7 @@ async function fetchPost(id: string) {
 
 export async function GET(request: NextRequest) {
   try {
-    const id = request.url.split('/blogs/')[1];
+    const id = request.url.split('/blog/')[1];
     const post = await fetchPost(id);
 
     return NextResponse.json({ sucess: true, data: post });
@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   const data = await request.json();
   try {
-    const id = request.url.split('/blogs/')[1];
+    const id = request.url.split('/blog/')[1];
     const post = await prisma.post.update({
       where: { id },
       data: {
@@ -36,7 +36,7 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const id = request.url.split('/blogs/')[1];
+    const id = request.url.split('/blog/')[1];
     const deleted = await prisma.post.delete({
       where: { id },
     });
