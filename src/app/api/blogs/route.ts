@@ -16,12 +16,12 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  const { title, description } = await request.json();
+  const data = await request.json();
   try {
     const post = await prisma.post.create({
       data: {
-        title,
-        description,
+        title: data.title,
+        description: data.description,
       },
     });
     return NextResponse.json({ success: true, data: post }, { status: 201 });
