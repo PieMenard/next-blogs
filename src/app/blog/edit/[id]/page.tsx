@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, Fragment, useRef } from 'react';
+import { FormEvent, Fragment, useEffect, useRef } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 
 const postBlog = async ({
@@ -19,18 +19,34 @@ const postBlog = async ({
   return (await res).json();
 };
 
-const AddBlogPage = () => {
+const getBlogById = async (id: string) => {
+  const res = await fetch(`/api/blog/${id}`);
+  const data = await res.json();
+  return data.data;
+};
+
+const EditBlogPage = ({ params }: { params: { id: string } }) => {
   const titleRef = useRef<HTMLInputElement | null>(null);
   const descriptionRef = useRef<HTMLTextAreaElement | null>(null);
+  useEffect(() => {
+    toast.loading('Fetching post...', { id: '1' });
+    getBlogById(params.id)
+      .then((data) => {
+        titleRef.current.value = data.title;
+        descriptionRef.current.value = data.description;
+        toast.success('Fetching complete', { id: '1' });
+      })
+      .catch((err) => toast.error('Error fetching post', { id: '1' }));
+  }, []);
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (titleRef.current && descriptionRef.current) {
       toast.loading('Sending Request', { id: '1' });
-      await postBlog({
-        title: titleRef.current?.value,
-        description: descriptionRef.current?.value,
-      });
+      //   await postBlog({
+      //     title: titleRef.current?.value,
+      //     description: descriptionRef.current?.value,
+      //   });
       toast.success('Blog Posted Succesfully', { id: '1' });
     }
   };
@@ -41,7 +57,7 @@ const AddBlogPage = () => {
       <div className="w-full m-auto flex my-4">
         <div className="flex flex-col justify-center items-center m-auto">
           <p className="text-2xl text-slate-200 font-bold p-3">
-            Add a Post to your blog
+            Edit your post
           </p>
           <form onSubmit={onSubmit}>
             <input
@@ -65,4 +81,4 @@ const AddBlogPage = () => {
   );
 };
 
-export default AddBlogPage;
+export default EditBlogPage;
