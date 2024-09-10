@@ -3,16 +3,19 @@
 import { FormEvent, Fragment, useEffect, useRef } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 
-const postBlog = async ({
-  title,
-  description,
-}: {
+type updateBlogParams = {
   title: string;
   description: string;
-}) => {
-  const res = fetch('/api/blog', {
-    method: 'POST',
-    body: JSON.stringify({ title, description }),
+  id: string;
+};
+
+const updateBlog = async (data: updateBlogParams) => {
+  const res = fetch(`/api/blog/${data.id}`, {
+    method: 'PUT',
+    body: JSON.stringify({
+      title: data.title,
+      description: data.description,
+    }),
     //@ts-ignore
     'Content-Type': 'application/json',
   });
@@ -32,9 +35,11 @@ const EditBlogPage = ({ params }: { params: { id: string } }) => {
     toast.loading('Fetching post...', { id: '1' });
     getBlogById(params.id)
       .then((data) => {
-        titleRef.current.value = data.title;
-        descriptionRef.current.value = data.description;
-        toast.success('Fetching complete', { id: '1' });
+        if (titleRef.current && descriptionRef.current) {
+          titleRef.current.value = data.title;
+          descriptionRef.current.value = data.description;
+          toast.success('Fetching complete', { id: '1' });
+        }
       })
       .catch((err) => toast.error('Error fetching post', { id: '1' }));
   }, []);
@@ -43,11 +48,12 @@ const EditBlogPage = ({ params }: { params: { id: string } }) => {
     e.preventDefault();
     if (titleRef.current && descriptionRef.current) {
       toast.loading('Sending Request', { id: '1' });
-      //   await postBlog({
-      //     title: titleRef.current?.value,
-      //     description: descriptionRef.current?.value,
-      //   });
-      toast.success('Blog Posted Succesfully', { id: '1' });
+      await updateBlog({
+        title: titleRef.current?.value,
+        description: descriptionRef.current?.value,
+        id: params.id,
+      });
+      toast.success('Blog Updated Succesfully', { id: '1' });
     }
   };
 
@@ -72,7 +78,7 @@ const EditBlogPage = ({ params }: { params: { id: string } }) => {
               className="rounded-md px-4 py-2 w-full my-2"
             ></textarea>
             <button className="font-semibold px-4 py-2 shadow-xl bg-slate-200 rounded-lg m-auto hover:bg-slate-100">
-              Submit
+              Update
             </button>
           </form>
         </div>
