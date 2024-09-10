@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { FormEvent, Fragment, useRef } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 
@@ -20,6 +21,7 @@ const postBlog = async ({
 };
 
 const AddBlogPage = () => {
+  const router = useRouter();
   const titleRef = useRef<HTMLInputElement | null>(null);
   const descriptionRef = useRef<HTMLTextAreaElement | null>(null);
 
@@ -32,6 +34,7 @@ const AddBlogPage = () => {
         description: descriptionRef.current?.value,
       });
       toast.success('Blog Posted Succesfully', { id: '1' });
+      router.push('/');
     }
   };
 
